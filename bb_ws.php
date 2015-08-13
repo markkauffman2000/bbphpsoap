@@ -529,9 +529,9 @@ print "---- end current course object array ----\n";
         } else if ($action == 'addcolumn') {
 ##
 #### add a column to the gradebook for _1288_1: mbk-2015-01-partner-b2tests
+#### WHEN YOU RUN THIS AGAINST YOUR SERVER you will need to hardcode a user Id and courseid that exist on your server.
 ##
-          // parameters are hard coded atm. $ok = isset($argv[2]);
-          $ok = true;
+          $ok = isset($argv[2]);
 
           if ($ok) {
 // Initialise a Gradebook SOAP client object
@@ -541,12 +541,13 @@ print "---- end current course object array ----\n";
               $ok = FALSE;
               print "ERROR: {$e->getMessage()}\n";
             }
+            $columnname=$argv[2];
           }
 
           $params = array();
           $params['courseId'] = '_1288_1';
           $params['columns'] = array(
-            'columnName' => 'testing7',
+            'columnName' => $columnname,
             'possible' => "100.0",
             "scorable"=> "true",
             "showStatsToStudent"=> "true",
@@ -554,11 +555,45 @@ print "---- end current course object array ----\n";
             "visibleInBook"=> "true"
             );
 
-          $id = $gradebook_client->saveColumns( $params );
-          print "New column Id:\n";         
-          var_dump(get_object_vars($id));
+          $result = $gradebook_client->saveColumns( $params );
+          print "result:\n";         
+          var_dump(get_object_vars($result));
+          $colid = $result->return;
+          print "colid is:{$colid}\n";
 	  print "End new column Id:\n";
+          
+          // Now add a grade for a user. user Id mkauffman: Mark Kauffman (_1425_1)
+          // const GET_SCORE_BY_COLUMN_ID_AND_USER_ID = 2; // http://library.blackboard.com/ref/72b6dc32-b778-4074-a670-4baed55b21f5/constant-values.html#blackboard.ws.gradebook.GradebookWSConstants.GET_SCORE_BY_MEMBER_ID_AND_COLUMN_ID
+          // const GET_SCORE_BY_COURSE_ID_AND_COLUMN_ID = 3; // http://library.blackboard.com/ref/72b6dc32-b778-4074-a670-4baed55b21f5/constant-values.html#blackboard.ws.gradebook.GradebookWSConstants.GET_SCORE_BY_MEMBER_ID_AND_COLUMN_ID
 
+          // first we get the grade/score
+          $columnFilter = new stdClass();
+          $columnFilterType = 1; // GET_COLUMN_BY_COURSE_ID
+          $columnFilter->columnFilterType = $columnFilterType;
+          
+          $columnFilters=array($columnFilter);
+
+          $scoreFilter = new stdClass();
+//          $scoreFilter->columnFilters = $columnFilters;
+          $scoreFilter->columnId = "_3494_1";
+          $scoreFilter->filterType = 3;
+
+          $params = array();
+          $params['courseId'] = '_1288_1';
+          
+/*
+          $params['filter'] = new stdClass(); 
+          $params['filter']->firstUserId = "_1425_1";
+          $params['filter']->userIds = array("_1425_1");
+          $params['filter']->columnId = "_3494_1";
+          $params['filter']->filterType = 2;
+*/
+          $params['filter'] = $scoreFilter;
+
+          $result = $gradebook_client->getGrades($params );
+          print "result:\n";         
+          var_dump(get_object_vars($result));
+           
         } else if ($action == 'member') {
 ##
 #### Get course membership details
@@ -640,7 +675,7 @@ print "---- end current course object array ----\n";
     print "  {$argv[0]} register                    -- register the proxy tool\n";
     print "  {$argv[0]} courses {username}          -- get course list for a user\n";
     print "  {$argv[0]} course {course}+            -- get course details (id/courseId)\n";
-    print "  {$argv[0]} createcourse {course}+            -- get course details (id/courseId)\n";
+    print "  {$argv[0]} addcolumn {columnname}      <-- READ THE CODE. DOES MORE THAN THIS\n";
     print "  {$argv[0]} user {user}+                -- get user details (id/username)\n";
     print "  {$argv[0]} member {courseId} {userId}* -- get course membership details\n";
 
