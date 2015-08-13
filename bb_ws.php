@@ -129,6 +129,32 @@ print "--- current course object array ----\n";
 print_r($courseObjectArray);
 print "---- end current course object array ----\n";
 
+
+// CREATE A GRADE/SCORE OBJECT this belongs to mkauffman in the course _1288_1. You will need to code this to be
+// general, find the users course member id in a specific course and use that.
+  $myScoreVO = new stdClass();
+  $myScoreVO->averageScore = (double) 0;
+  $myScoreVO->columnId = "_3507_1"; // column named blah44
+  $myScoreVO->courseId = NULL;
+  $myScoreVO->exempt = 0; //false
+  $myScoreVO->expansionData = NULL;
+  $myScoreVO->firstAttemptId = NULL;
+  $myScoreVO->grade = "75";
+  $myScoreVO->highestAttemptId = NULL;
+  $myScoreVO->id = "_1635_1";
+  $myScoreVO->instructorComments = NULL;
+  $myScoreVO->lastAttemptId = NULL;
+  $myScoreVO->lowestAttemptId = NULL;
+  $myScoreVO->manualGrade = "75";
+  $myScoreVO->manualScore = (double)75;
+  $myScoreVO->memberId = "_2121_1";
+  $myScoreVO->schemaGradeValue = "75.00";
+  $myScoreVO->shortInstructorComments = NULL;
+  $myScoreVO->shortStudentComments = NULL;
+  $myScoreVO->status = (int)1;
+  $myScoreVO->studentComments = NULL;
+  $myScoreVO->userId = NULL;
+
 // START Stephen's Original Code
 
 // Load configuration settings
@@ -575,7 +601,9 @@ print "---- end current course object array ----\n";
 
           $scoreFilter = new stdClass();
 //          $scoreFilter->columnFilters = $columnFilters;
-          $scoreFilter->columnId = "_3494_1";
+//          $scoreFilter->columnId = "_3494_1";
+          $scoreFilter->columnId = "_3507_1";
+//          $scoreFilter->columnId = $colid;
           $scoreFilter->filterType = 3;
 
           $params = array();
@@ -591,7 +619,16 @@ print "---- end current course object array ----\n";
           $params['filter'] = $scoreFilter;
 
           $result = $gradebook_client->getGrades($params );
-          print "result:\n";         
+          print "getGrades result:\n";         
+          var_dump(get_object_vars($result));
+          
+          $gradesArray = array($myScoreVO);
+          $params = array();
+          $params['courseId'] = "_1288_1";
+          $params['grades'] = $gradesArray;
+          $params['overrideIfManual'] = TRUE;
+          $result = $gradebook_client->saveGrades($params);
+          print "saveGrades result:\n";
           var_dump(get_object_vars($result));
            
         } else if ($action == 'member') {
