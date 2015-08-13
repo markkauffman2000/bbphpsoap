@@ -141,7 +141,7 @@ print "---- end current course object array ----\n";
   $myScoreVO->firstAttemptId = NULL;
   $myScoreVO->grade = "75";
   $myScoreVO->highestAttemptId = NULL;
-  $myScoreVO->id = "_1635_1";
+//  $myScoreVO->id = "_1635_1";
   $myScoreVO->instructorComments = NULL;
   $myScoreVO->lastAttemptId = NULL;
   $myScoreVO->lowestAttemptId = NULL;
@@ -621,7 +621,8 @@ print "---- end current course object array ----\n";
           $result = $gradebook_client->getGrades($params );
           print "getGrades result:\n";         
           var_dump(get_object_vars($result));
-          
+           
+          $myScoreVO->columnId = $colid; // this should save the score in our new column. 
           $gradesArray = array($myScoreVO);
           $params = array();
           $params['courseId'] = "_1288_1";
