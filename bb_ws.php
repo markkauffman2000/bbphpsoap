@@ -23,6 +23,7 @@
  *   1.0.00  10-Feb-13  Initial version
  *   1.1.00  27-Apr-13  Added members option to retrieve course memberships
  *                      Allow course and user options to list multiple IDs
+ *   mbk     14-Aug-15  Hacked in addcolumn to create a column, save a grade there, and fetch it.
 */
 
 /*
@@ -139,16 +140,16 @@ print "---- end current course object array ----\n";
   $myScoreVO->exempt = 0; //false
   $myScoreVO->expansionData = NULL;
   $myScoreVO->firstAttemptId = NULL;
-  $myScoreVO->grade = "75";
+  $myScoreVO->grade = "22";
   $myScoreVO->highestAttemptId = NULL;
 //  $myScoreVO->id = "_1635_1";
   $myScoreVO->instructorComments = NULL;
   $myScoreVO->lastAttemptId = NULL;
   $myScoreVO->lowestAttemptId = NULL;
-  $myScoreVO->manualGrade = "75";
-  $myScoreVO->manualScore = (double)75;
+  $myScoreVO->manualGrade = "22";
+  $myScoreVO->manualScore = (double)22;
   $myScoreVO->memberId = "_2121_1";
-  $myScoreVO->schemaGradeValue = "75.00";
+  $myScoreVO->schemaGradeValue = "22.00";
   $myScoreVO->shortInstructorComments = NULL;
   $myScoreVO->shortStudentComments = NULL;
   $myScoreVO->status = (int)1;
@@ -555,7 +556,10 @@ print "---- end current course object array ----\n";
         } else if ($action == 'addcolumn') {
 ##
 #### add a column to the gradebook for _1288_1: mbk-2015-01-partner-b2tests
+#### then save a grade there, READ the myScoreVO def at the top of this code.
+###  then fetch the grade back
 #### WHEN YOU RUN THIS AGAINST YOUR SERVER you will need to hardcode a user Id and courseid that exist on your server.
+#### after we add the column, we get it, then we add a grade to it.
 ##
           $ok = isset($argv[2]);
 
@@ -591,37 +595,34 @@ print "---- end current course object array ----\n";
           // Now add a grade for a user. user Id mkauffman: Mark Kauffman (_1425_1)
           // const GET_SCORE_BY_COLUMN_ID_AND_USER_ID = 2; // http://library.blackboard.com/ref/72b6dc32-b778-4074-a670-4baed55b21f5/constant-values.html#blackboard.ws.gradebook.GradebookWSConstants.GET_SCORE_BY_MEMBER_ID_AND_COLUMN_ID
           // const GET_SCORE_BY_COURSE_ID_AND_COLUMN_ID = 3; // http://library.blackboard.com/ref/72b6dc32-b778-4074-a670-4baed55b21f5/constant-values.html#blackboard.ws.gradebook.GradebookWSConstants.GET_SCORE_BY_MEMBER_ID_AND_COLUMN_ID
+         // const GET_SCORE_BY_ID = 7
+         // NOTE: column_id and id are DIFFERENT.
 
-          // first we get the grade/score
+          // first we get a previous grade/score. this is hard coded.
+          // the result will not be null IF we get a grade that we previously set.
+/* IGNORE this column filter. were' not using it for this example.
           $columnFilter = new stdClass();
           $columnFilterType = 1; // GET_COLUMN_BY_COURSE_ID
           $columnFilter->columnFilterType = $columnFilterType;
-          
           $columnFilters=array($columnFilter);
-
+*/
+          
           $scoreFilter = new stdClass();
 //          $scoreFilter->columnFilters = $columnFilters;
-//          $scoreFilter->columnId = "_3494_1";
           $scoreFilter->columnId = "_3507_1";
-//          $scoreFilter->columnId = $colid;
-          $scoreFilter->filterType = 3;
+          $scoreFilter->filterType = 3; // GET_SCORE_BY_COURSE_ID_AND_COLUMN_ID
 
           $params = array();
           $params['courseId'] = '_1288_1';
           
-/*
-          $params['filter'] = new stdClass(); 
-          $params['filter']->firstUserId = "_1425_1";
-          $params['filter']->userIds = array("_1425_1");
-          $params['filter']->columnId = "_3494_1";
-          $params['filter']->filterType = 2;
-*/
           $params['filter'] = $scoreFilter;
 
           $result = $gradebook_client->getGrades($params );
           print "getGrades result:\n";         
           var_dump(get_object_vars($result));
            
+// NOW we add the grade to the column we created above.
+
           $myScoreVO->columnId = $colid; // this should save the score in our new column. 
           $gradesArray = array($myScoreVO);
           $params = array();
@@ -630,6 +631,23 @@ print "---- end current course object array ----\n";
           $params['overrideIfManual'] = TRUE;
           $result = $gradebook_client->saveGrades($params);
           print "saveGrades result:\n";
+          var_dump(get_object_vars($result));
+          $new_id = $result->return; // THIS IS NOT the column_id.
+          print "new_id: {$new_id}\n";
+
+// now demonstrate getting the grade that we just saved!
+
+          $scoreFilter = new stdClass();
+          $scoreFilter->id = $new_id;
+          $scoreFilter->filterType = 7; // GET_SCORE_BY_ID
+
+          $params = array();
+          $params['courseId'] = '_1288_1';
+          
+          $params['filter'] = $scoreFilter;
+
+          $result = $gradebook_client->getGrades($params );
+          print "2nd getGrades result:\n";         
           var_dump(get_object_vars($result));
            
         } else if ($action == 'member') {
