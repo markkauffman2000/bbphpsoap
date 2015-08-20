@@ -150,7 +150,8 @@ print "---- end current course object array ----\n";
   $myScoreVO->lowestAttemptId = NULL;
   $myScoreVO->manualGrade = "22";
   $myScoreVO->manualScore = (double)22;
-  $myScoreVO->memberId = "_2121_1";
+  // $myScoreVO->memberId = "_2121_1";
+  $myScoreVO->memberId = NULL;
   $myScoreVO->schemaGradeValue = "22.00";
   $myScoreVO->shortInstructorComments = NULL;
   $myScoreVO->shortStudentComments = NULL;
@@ -630,7 +631,7 @@ print "---- end current course object array ----\n";
 // NOW we add the grade to the column we created above.
 
           $myScoreVO->columnId = $colid; // this should save the score in our new column. 
-          $myScoreVO->memberId = NULL;
+          $myScoreVO->courseId = $courseId;
           $myScoreVO->userId =  $userId;
           $gradesArray = array($myScoreVO);
           $params = array();
