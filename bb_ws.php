@@ -126,10 +126,12 @@ $courseObject->description = "kauffman's php creation";
 $courseObject->id = "";
 $courseObject->name = "Mark Kauffman's PHP Creation 101";
 */
+
+/*
 print "--- current course object array ----\n";
 print_r($courseObjectArray);
 print "---- end current course object array ----\n";
-
+*/
 
 // CREATE A GRADE/SCORE OBJECT this belongs to mkauffman in the course _1288_1. You will need to code this to be
 // general, find the users course member id in a specific course and use that.
@@ -558,10 +560,10 @@ print "---- end current course object array ----\n";
 #### add a column to the gradebook for _1288_1: mbk-2015-01-partner-b2tests
 #### then save a grade there, READ the myScoreVO def at the top of this code.
 ###  then fetch the grade back
-#### WHEN YOU RUN THIS AGAINST YOUR SERVER you will need to hardcode a user Id and courseid that exist on your server.
+#### WHEN YOU RUN THIS AGAINST YOUR SERVER you will need to input a userId and courseId that exist on your server.
 #### after we add the column, we get it, then we add a grade to it.
 ##
-          $ok = isset($argv[2]);
+          $ok = (isset($argv[2]) && isset($argv[3]) && isset($argv[4])); // need courseId userId and newcolumnName
 
           if ($ok) {
 // Initialise a Gradebook SOAP client object
@@ -571,11 +573,13 @@ print "---- end current course object array ----\n";
               $ok = FALSE;
               print "ERROR: {$e->getMessage()}\n";
             }
-            $columnname=$argv[2];
+            $courseId=$argv[2];
+            $userId=$argv[3];
+            $columnname=$argv[4];
           }
 
           $params = array();
-          $params['courseId'] = '_1288_1';
+          $params['courseId'] = $courseId;
           $params['columns'] = array(
             'columnName' => $columnname,
             'possible' => "100.0",
@@ -586,7 +590,7 @@ print "---- end current course object array ----\n";
             );
 
           $result = $gradebook_client->saveColumns( $params );
-          print "result:\n";         
+          print "saveColumns result:\n";         
           var_dump(get_object_vars($result));
           $colid = $result->return;
           print "colid is:{$colid}\n";
@@ -598,19 +602,19 @@ print "---- end current course object array ----\n";
          // const GET_SCORE_BY_ID = 7
          // NOTE: column_id and id are DIFFERENT.
 
+/* IGNORE This is a hard-coded fetch of a saved score on a particular system.
           // first we get a previous grade/score. this is hard coded.
           // the result will not be null IF we get a grade that we previously set.
-/* IGNORE this column filter. were' not using it for this example.
+// IGNORE this column filter. were' not using it for this example.
           $columnFilter = new stdClass();
           $columnFilterType = 1; // GET_COLUMN_BY_COURSE_ID
           $columnFilter->columnFilterType = $columnFilterType;
           $columnFilters=array($columnFilter);
-*/
           
           $scoreFilter = new stdClass();
 //          $scoreFilter->columnFilters = $columnFilters;
           $scoreFilter->columnId = "_3507_1";
-          $scoreFilter->filterType = 3; // GET_SCORE_BY_COURSE_ID_AND_COLUMN_ID
+          $scoreFilter->filterType = 3; // GET_SCORE_BY_COLUMN_ID
 
           $params = array();
           $params['courseId'] = '_1288_1';
@@ -620,13 +624,17 @@ print "---- end current course object array ----\n";
           $result = $gradebook_client->getGrades($params );
           print "getGrades result:\n";         
           var_dump(get_object_vars($result));
+// END IGNORES
+*/
            
 // NOW we add the grade to the column we created above.
 
           $myScoreVO->columnId = $colid; // this should save the score in our new column. 
+          $myScoreVO->memberId = NULL;
+          $myScoreVO->userId =  $userId;
           $gradesArray = array($myScoreVO);
           $params = array();
-          $params['courseId'] = "_1288_1";
+          $params['courseId'] = $courseId;
           $params['grades'] = $gradesArray;
           $params['overrideIfManual'] = TRUE;
           $result = $gradebook_client->saveGrades($params);
@@ -731,7 +739,7 @@ print "---- end current course object array ----\n";
     print "  {$argv[0]} register                    -- register the proxy tool\n";
     print "  {$argv[0]} courses {username}          -- get course list for a user\n";
     print "  {$argv[0]} course {course}+            -- get course details (id/courseId)\n";
-    print "  {$argv[0]} addcolumn {columnname}      <-- READ THE CODE. DOES MORE THAN THIS\n";
+    print "  {$argv[0]} addcolumn {courseId} {userId} {newcolumnname}      <-- READ THE CODE. DOES MORE THAN THIS\n";
     print "  {$argv[0]} user {user}+                -- get user details (id/username)\n";
     print "  {$argv[0]} member {courseId} {userId}* -- get course membership details\n";
 

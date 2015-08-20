@@ -29,6 +29,6 @@
   define('VENDOR_ID', 'mbk');
   define('PROGRAM_ID', 'ws-sample-php');
   define('TOOL_DESCRIPTION', 'A proxy tool to demonstrate accessing Learn 9 web services using PHP');
-  define('SHARED_SECRET', 'changeme');
+  define('SHARED_SECRET', 'd0gstar2');
 
 ?>
