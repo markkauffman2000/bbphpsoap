@@ -178,7 +178,7 @@ print "---- end current course object array ----\n";
 
 // Initialise a Context SOAP client object
     try {
-      $context_client = new BbSoapClient(SERVER_URL . '/webapps/ws/services/Context.WS?wsdl');
+      $context_client = new BbSoapClient(SERVER_URL . '/webapps/ws/services/Context.WS?wsdl', array('trace' => 1));
     } catch (Exception $e) {
       $ok = FALSE;
       print "ERROR: {$e->getMessage()}\n";
@@ -357,6 +357,21 @@ print "---- end current course object array ----\n";
 // Get a session ID
       try {
         $result = $context_client->initialize();
+
+        $headers = $context_client->__getLastResponseHeaders();
+        print "-- context_client initialize LastResponseHeaders --\n";
+        var_dump($headers);
+        // From http://stackoverflow.com/questions/895786/how-to-get-the-cookies-from-a-php-curl-into-a-variable
+	// multi-cookie variant contributed by @Combuster in comments
+	preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $headers, $matches);
+	$cookies = array();
+	foreach($matches[1] as $item) {
+	    parse_str($item, $cookie);
+	    $cookies = array_merge($cookies, $cookie);
+	}
+        print "-- context_client initialize LastResponse cookies --\n";
+	var_dump($cookies);
+
         $password = $result->return;
       } catch (Exception $e) {
         $err = TRUE;
@@ -374,6 +389,21 @@ print "---- end current course object array ----\n";
         $input->expectedLifeSeconds = 3600;
         try {
           $result = $context_client->loginTool($input);
+
+		$headers = $context_client->__getLastResponseHeaders();
+                print "-- context_client loginTool LastResponseHeaders --\n";
+		var_dump($headers);
+		// From http://stackoverflow.com/questions/895786/how-to-get-the-cookies-from-a-php-curl-into-a-variable
+		// multi-cookie variant contributed by @Combuster in comments
+		preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $headers, $matches);
+		$cookies = array();
+		foreach($matches[1] as $item) {
+		    parse_str($item, $cookie);
+		    $cookies = array_merge($cookies, $cookie);
+		}
+                print "-- context_client initialize LastResponse cookies --\n";
+		var_dump($cookies);
+
         } catch (Exception $e) {
           $err = TRUE;
           print "ERROR: {$e->getMessage()}\n";
