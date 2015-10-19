@@ -396,21 +396,7 @@ print "---- end current course object array ----\n";
         $input->expectedLifeSeconds = 3600;
         try {
           $result = $context_client->loginTool($input);
-
-		$headers = $context_client->__getLastResponseHeaders();
-                print "-- context_client loginTool LastResponseHeaders --\n";
-		var_dump($headers);
-		// From http://stackoverflow.com/questions/895786/how-to-get-the-cookies-from-a-php-curl-into-a-variable
-		// multi-cookie variant contributed by @Combuster in comments
-		preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $headers, $matches);
-		$cookies = array();
-		foreach($matches[1] as $item) {
-		    parse_str($item, $cookie);
-		    $cookies = array_merge($cookies, $cookie);
-		}
-                print "-- context_client initialize LastResponse cookies --\n";
-		var_dump($cookies);
-
+          // There are no cookies set on login. The action was all back on the context_client initialize call.
         } catch (Exception $e) {
           $err = TRUE;
           print "ERROR: {$e->getMessage()}\n";
@@ -456,6 +442,16 @@ print "---- end current course object array ----\n";
               $ok = FALSE;
               print "ERROR: {$e->getMessage()}\n";
             }
+          }
+
+
+          print "Setting cookies for course web service endpoint.\n";
+          foreach($cookies as $cookie_name => $cookie_value) {
+            print "Setting course_client cookie:\n";
+            print "Cookie Name:$cookie_name\n";
+            print "Cookie Value:$cookie_value\n";
+            print "\n";
+            $course_client->__setCookie($cookie_name, $cookie_value);
           }
 
           if ($ok) {
@@ -516,6 +512,16 @@ print "---- end current course object array ----\n";
             }
           }
 
+          print "Setting cookies for course web service endpoint.\n";
+          foreach($cookies as $cookie_name => $cookie_value) {
+            print "Setting course_client cookie:\n";
+            print "Cookie Name:$cookie_name\n";
+            print "Cookie Value:$cookie_value\n";
+            print "\n";
+            $course_client->__setCookie($cookie_name, $cookie_value);
+          }
+
+
           if ($ok) {
             print 'Creating course... ';
 
@@ -550,6 +556,16 @@ print "---- end current course object array ----\n";
               print "ERROR: {$e->getMessage()}\n";
             }
           }
+
+          print "Setting cookies for User web service endpoint.\n";
+          foreach($cookies as $cookie_name => $cookie_value) {
+            print "Setting user_client cookie:\n";
+            print "Cookie Name:$cookie_name\n";
+            print "Cookie Value:$cookie_value\n";
+            print "\n";
+            $user_client->__setCookie($cookie_name, $cookie_value);
+          }
+
 
           if ($ok) {
             print 'Retrieving user(s)... ';
@@ -725,6 +741,16 @@ print "---- end current course object array ----\n";
               print "ERROR: {$e->getMessage()}\n";
             }
           }
+
+          print "Setting cookies for CourseMembership web service endpoint.\n";
+          foreach($cookies as $cookie_name => $cookie_value) {
+            print "Setting membership_client cookie:\n";
+            print "Cookie Name:$cookie_name\n";
+            print "Cookie Value:$cookie_value\n";
+            print "\n";
+            $membership_client->__setCookie($cookie_name, $cookie_value);
+          }
+
 
           if ($ok) {
             print 'Retrieving membership(s)... ';
