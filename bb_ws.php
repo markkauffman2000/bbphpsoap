@@ -372,6 +372,13 @@ print "---- end current course object array ----\n";
         print "-- context_client initialize LastResponse cookies --\n";
 	var_dump($cookies);
 
+        foreach($cookies as $cookie_name => $cookie_value) {
+          print "Cookie Name:$cookie_name\n";
+          print "Cookie Value:$cookie_value\n";
+          print "\n";
+          $context_client->__setCookie($cookie_name, $cookie_value);
+        }
+
         $password = $result->return;
       } catch (Exception $e) {
         $err = TRUE;
@@ -609,6 +616,15 @@ print "---- end current course object array ----\n";
             $columnname=$argv[4];
           }
 
+          print "Setting cookies for gradebook web service endpoint.\n";
+          foreach($cookies as $cookie_name => $cookie_value) {
+            print "Setting gradebook_client cookie:\n";
+            print "Cookie Name:$cookie_name\n";
+            print "Cookie Value:$cookie_value\n";
+            print "\n";
+            $gradebook_client->__setCookie($cookie_name, $cookie_value);
+          }
+
           $params = array();
           $params['courseId'] = $courseId;
           $params['columns'] = array(
@@ -621,6 +637,11 @@ print "---- end current course object array ----\n";
             );
 
           $result = $gradebook_client->saveColumns( $params );
+          print "--gradebook_client headers--\n";
+          $headers = $gradebook_client->__getLastResponseHeaders();
+          print "-- gradebook_client LastResponseHeaders --\n";
+          var_dump($headers);
+
           print "saveColumns result:\n";         
           var_dump(get_object_vars($result));
           $colid = $result->return;
