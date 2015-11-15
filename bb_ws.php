@@ -670,31 +670,6 @@ print "---- end current course object array ----\n";
          // const GET_SCORE_BY_ID = 7
          // NOTE: column_id and id are DIFFERENT.
 
-/* IGNORE This is a hard-coded fetch of a saved score on a particular system.
-          // first we get a previous grade/score. this is hard coded.
-          // the result will not be null IF we get a grade that we previously set.
-// IGNORE this column filter. were' not using it for this example.
-          $columnFilter = new stdClass();
-          $columnFilterType = 1; // GET_COLUMN_BY_COURSE_ID
-          $columnFilter->columnFilterType = $columnFilterType;
-          $columnFilters=array($columnFilter);
-          
-          $scoreFilter = new stdClass();
-//          $scoreFilter->columnFilters = $columnFilters;
-          $scoreFilter->columnId = "_3507_1";
-          $scoreFilter->filterType = 3; // GET_SCORE_BY_COLUMN_ID
-
-          $params = array();
-          $params['courseId'] = '_1288_1';
-          
-          $params['filter'] = $scoreFilter;
-
-          $result = $gradebook_client->getGrades($params );
-          print "getGrades result:\n";         
-          var_dump(get_object_vars($result));
-// END IGNORES
-*/
-           
 // NOW we add the grade to the column we created above.
 
           $myScoreVO->columnId = $colid; // this should save the score in our new column. 
@@ -718,12 +693,24 @@ print "---- end current course object array ----\n";
           $scoreFilter->filterType = 7; // GET_SCORE_BY_ID
 
           $params = array();
-          $params['courseId'] = '_1288_1';
+          $params['courseId'] = $courseId;
           
           $params['filter'] = $scoreFilter;
 
           $result = $gradebook_client->getGrades($params );
           print "2nd getGrades result:\n";         
+          var_dump(get_object_vars($result));
+
+          $params = array();
+          $columnFilter = new stdClass();
+          // $columnFilter->filterType = 2; // GET_COLUMN_BY_COURSE_ID_AND_NAME
+          // $columnFilter->courseId = $courseId; 
+          // $columnFilter->name = $columnname;
+          $columnFilter->filterType = 1; // GET_COLUMN_BY_COURSE_ID
+          $params['courseId'] = $courseId;
+          $params['filter'] = $columnFilter;
+          $result = $gradebook_client->getGradebookColumns($params );
+          print "getGradebookColumns result: result:\n";         
           var_dump(get_object_vars($result));
            
         } else if ($action == 'member') {

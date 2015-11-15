@@ -23,12 +23,12 @@
  *   1.0.00  10-Feb-13  Initial version
 */
 
-  define('SERVER_URL', 'https://snhustage2.blackboard.com');   // URL to Learn 9 server (without a closing "/")
+  define('SERVER_URL', 'https://learnsystem.yourinc.com');   // URL to Learn 9 server (without a closing "/")
   define('REGISTRATION_PASSWORD', 'blahblah');  // Proxy Tool registration password for Learn 9 server
 
-  define('VENDOR_ID', 'MindEdge');
-  define('PROGRAM_ID', 'MindEdge WebService');
+  define('VENDOR_ID', 'markkauffman');
+  define('PROGRAM_ID', 'markkauffman');
   define('TOOL_DESCRIPTION', 'A proxy tool to demonstrate accessing Learn 9 web services using PHP');
-  define('SHARED_SECRET', 'blahblah');
+  define('SHARED_SECRET', 'mbk_px');
 
 ?>
