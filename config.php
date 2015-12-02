@@ -29,6 +29,6 @@
   define('VENDOR_ID', 'markkauffman');
   define('PROGRAM_ID', 'markkauffman');
   define('TOOL_DESCRIPTION', 'A proxy tool to demonstrate accessing Learn 9 web services using PHP');
-  define('SHARED_SECRET', 'mbk_px');
+  define('SHARED_SECRET', 'blahblah');
 
 ?>
